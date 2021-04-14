@@ -23,3 +23,16 @@ test('UPDATE_PRODUCTS', () => {
   expect(newState.products.length).toBe(2);
   expect(initialState.products.length).toBe(0);
 });
+<<<<<<< HEAD
+=======
+
+test('UPDATE_CATEGORIES', () => {
+  let newState = reducer(initialState, {
+    type: UPDATE_CATEGORIES,
+    categories: [{}, {}]
+  });
+
+  expect(newState.categories.length).toBe(2);
+  expect(initialState.categories.length).toBe(1);
+});
+>>>>>>> develop
