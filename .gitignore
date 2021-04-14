@@ -102,9 +102,3 @@ dist
 
 # TernJS port file
 .tern-port
-
-# Starter files
-module-22-starter.zip
-
-# Staging DB
-mongodb-client.js
