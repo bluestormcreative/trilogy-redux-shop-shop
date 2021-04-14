@@ -105,3 +105,6 @@ dist
 
 # Starter files
 module-22-starter.zip
+
+# Staging DB
+mongodb-client.js

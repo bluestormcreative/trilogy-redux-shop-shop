@@ -20,7 +20,7 @@ const client = new ApolloClient({
       }
     })
   },
-  uri: '/graphql',
+  uri: 'https://localhost:3001/graphql',
 })
 
 function App() {
