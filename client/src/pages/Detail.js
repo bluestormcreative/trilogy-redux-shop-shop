@@ -18,15 +18,20 @@ function Detail() {
   const { products } = state;
 
   useEffect(() => {
+    // if we already have products saved in global state, use those to find the one we want.
     if (products.length) {
       setCurrentProduct(products.find(product => product._id === id));
+    
+    // otherwise, once the query data loads, set all the products in the global state (context)
+    // that will trigger this to run again (because it's in the dependency array), which will set
+    // the current product data to use in the component state.
     } else if (data) {
       dispatch({
         type: UPDATE_PRODUCTS,
         products: data.products
       });
     }
-  }, [products, data, dispatch, id]);
+  }, [products, data, dispatch, id]); // will only run again if one of these changes
 
   return (
     <>
