@@ -17,26 +17,35 @@ import spinner from '../assets/spinner.gif'
 function Detail() {
   const { id } = useParams();
   const [state, dispatch] = useStoreContext();
+  const { products, cart } = state;
 
   const addToCart = () => {
-    dispatch({
-      type: ADD_TO_CART,
-      product: { ...currentProduct, purchaseQuantity: 1 }
-    });
+    const itemInCart = cart.find((cartItem) => cartItem._id === id);
+  
+    if (itemInCart) {
+      dispatch({
+        type: UPDATE_CART_QUANTITY,
+        _id: id,
+        purchaseQuantity: parseInt(itemInCart.purchaseQuantity) + 1
+      });
+    } else {
+      dispatch({
+        type: ADD_TO_CART,
+        product: { ...currentProduct, purchaseQuantity: 1 }
+      });
+    }
   };
 
-  const removeFromCart = (productId) => {
+  const removeFromCart = () => {
     dispatch({
       type: REMOVE_FROM_CART,
-      _id: productId
+      _id: currentProduct._id
     });
   };
 
   const [currentProduct, setCurrentProduct] = useState({})
 
   const { loading, data } = useQuery(QUERY_PRODUCTS);
-
-  const { products } = state;
 
   useEffect(() => {
     // if we already have products saved in global state, use those to find the one we want.
@@ -75,7 +84,10 @@ function Detail() {
             <button onClick={addToCart}>
               Add to Cart
             </button>
-            <button onClick={() => removeFromCart(currentProduct._id)}>
+            <button
+              disabled={!cart.find(p => p._id === currentProduct._id)}
+              onClick={removeFromCart}
+            >
               Remove from Cart
             </button>
           </p>
