@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useLazyQuery } from '@apollo/react-hooks';
 import { loadStripe } from '@stripe/stripe-js';
 import Auth from '../../utils/auth';
 import { useStoreContext } from '../../utils/GlobalState';
@@ -14,6 +15,7 @@ import './style.css';
 
 const Cart = () => {
   const [state, dispatch] = useStoreContext();
+  const [getCheckout, { data }] = useLazyQuery(QUERY_CHECKOUT); // Hook is not called on render, but on user action.
 
   useEffect(() => {
     async function getCart() {
@@ -45,6 +47,10 @@ const Cart = () => {
       for (let i = 0; i < item.purchaseQuantity; i++) {
         productIds.push(item._id);
       }
+    });
+
+    getCheckout({
+      variables: { products: productIds }
     });
   }
 
