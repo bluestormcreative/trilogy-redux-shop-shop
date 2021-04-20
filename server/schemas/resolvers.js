@@ -54,7 +54,7 @@ const resolvers = {
     },
     checkout: async (parent, args, context) => {
       const url = new URL(context.headers.referer).origin; // Get headers so we can redirect to localhost / prod envs.
-
+      console.log(url);
       const order = new Order({ products: args.products }); // order Mongoose model
       const { products } = await order.populate('products').execPopulate();
 
@@ -85,8 +85,8 @@ const resolvers = {
         payment_method_types: ['card'],
         line_items,
         mode: 'payment',
-        success_url: '{$url}/success?session_id={CHECKOUT_SESSION_ID}',
-        cancel_url: '{$url}/'
+        success_url: `${url}/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${url}/`
       });
       
       return { session: session.id };
