@@ -2,43 +2,29 @@ import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { useQuery } from '@apollo/react-hooks';
 
-// import { useStoreContext } from "../../utils/GlobalState";
-import { UPDATE_CATEGORIES, UPDATE_CURRENT_CATEGORY } from '../../utils/actions';
-import { QUERY_CATEGORIES } from "../../utils/queries";
+import { updateCurrentCategory, updateCategories } from '../../utils/actionCreators';
+import { QUERY_CATEGORIES } from '../../utils/queries';
 import { idbPromise } from '../../utils/helpers';
 
-function CategoryMenu({categories}) {
-  // Custom hook calls the context, returns the state and dispatch to update state.
-  // const [state, dispatch] = useStoreContext();
-  // const { categories } = state;
-  
+function CategoryMenu({categories, setCurrentCategory, setCategories}) {  
   const { loading, data: categoryData } = useQuery(QUERY_CATEGORIES);
 
   const handleClick = (id) => {
-    store.dispatch({
-      type: UPDATE_CURRENT_CATEGORY,
-      payload: id
-    });
+    setCurrentCategory(id);
   };
 
   useEffect(() => {
     if (categoryData) {
-      store.dispatch({
-        type: UPDATE_CATEGORIES,
-        payload: categoryData.categories
-      });
+      setCategories(categoryData.categories);
       categoryData.categories.forEach(category => {
         idbPromise('categories', 'put', category);
       });
     } else if (!loading) {
       idbPromise('categories', 'get').then(categories => {
-        dispatch({
-          type: UPDATE_CATEGORIES,
-          categories: categories
-        });
+        setCategories(categories);
       });
     }
-  }, [categoryData, loading, dispatch]);
+  }, [categoryData, loading, setCategories]);
 
   return (
     <div>
@@ -63,4 +49,9 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps)(CategoryMenu);
+const mapDispatchToProps = dispatch => ({
+  setCurrentCategory: (id) => dispatch(updateCurrentCategory(id)),
+  setCategories: (data) => dispatch(updateCategories(data))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(CategoryMenu);
