@@ -3,9 +3,8 @@ import { connect } from "react-redux";
 import { useLazyQuery } from '@apollo/react-hooks';
 import { loadStripe } from '@stripe/stripe-js';
 import Auth from '../../utils/auth';
-// import { useStoreContext } from '../../utils/GlobalState';
 import { QUERY_CHECKOUT } from '../../utils/queries';
-import { TOGGLE_CART, ADD_MULTIPLE_TO_CART } from "../../utils/actions";
+import { toggleCart, addMultipleToCart } from '../../utils/actionCreators';
 import { idbPromise } from "../../utils/helpers";
 import CartItem from '../CartItem';
 
@@ -14,19 +13,25 @@ import './style.css';
 const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
 
 const Cart = (props) => {
-  // const [state, dispatch] = useStoreContext();
   const [getCheckout, { data }] = useLazyQuery(QUERY_CHECKOUT); // Hook is not called on render, but on user action.
 
-  // useEffect(() => {
-  //   async function getCart() {
-  //     const cart = await idbPromise('cart', 'get');
-  //     // dispatch({ type: ADD_MULTIPLE_TO_CART, products: [...cart] });
-  //   };
+  const {
+    addMultipleProductsToCart,
+    toggleCartOpen,
+    cart,
+    cartOpen,
+  } = props;
+
+  useEffect(() => {
+    async function getCart() {
+      const storedCart = await idbPromise('cart', 'get');
+      addMultipleProductsToCart([...storedCart]);
+    };
   
-  //   if (!props.cart.length) {
-  //     getCart();
-  //   }
-  // }, [props.cart.length, dispatch]);
+    if (!cart.length) {
+      getCart();
+    }
+  }, [cart.length, addMultipleProductsToCart]);
 
   useEffect(() => {
     if (data) {
@@ -36,13 +41,9 @@ const Cart = (props) => {
     }
   }, [data]);
 
-  // const toggleCart = () => {
-  //   dispatch({ type: TOGGLE_CART });
-  // };
-
   const calculateTotal = () => {
     let sum = 0;
-    state.cart.forEach(item => {
+    cart.forEach(item => {
       sum += item.price * item.purchaseQuantity;
     });
     return sum.toFixed(2);
@@ -51,7 +52,7 @@ const Cart = (props) => {
   function submitCheckout() {
     const productIds = [];
   
-    props.cart.forEach((item) => {
+    cart.forEach((item) => {
       for (let i = 0; i < item.purchaseQuantity; i++) {
         productIds.push(item._id);
       }
@@ -62,9 +63,9 @@ const Cart = (props) => {
     });
   }
 
-  if (!props.cartOpen) {
+  if (!cartOpen) {
     return (
-      <div className="cart-closed" onClick={toggleCart}>
+      <div className="cart-closed" onClick={toggleCartOpen}>
         <span
           role="img"
           aria-label="trash">🛒</span>
@@ -74,11 +75,11 @@ const Cart = (props) => {
 
   return (
     <div className="cart">
-      <div className="close" onClick={toggleCart}>[close]</div>
+      <div className="close" onClick={toggleCartOpen}>[close]</div>
       <h2>Shopping Cart</h2>
-      {state.cart.length ? (
+      {cart.length ? (
         <div>
-            {state.cart.map((item) => (
+            {cart.map((item) => (
               <CartItem key={item._id} item={item} />
           ))}
 
@@ -108,8 +109,14 @@ const Cart = (props) => {
 
 const mapStateToProps = state => {
   return {
-    cart: state.cart
+    cart: state.cart,
+    cartOpen: state.cartOpen,
   };
 };
 
-export default connect(mapStateToProps)(Cart);
+const mapDispatchToProps = dispatch => ({
+  toggleCartOpen: () => dispatch(toggleCart()),
+  addMultipleProductsToCart: (data) => dispatch(addMultipleToCart(data)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Cart);
