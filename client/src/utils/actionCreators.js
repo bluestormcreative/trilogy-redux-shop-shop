@@ -31,6 +31,15 @@ const removeFromCart = (productId) => ({
   payload: productId
 });
 
+const toggleCart = () => ({
+  type: actions.TOGGLE_CART,
+});
+
+const addMultipleToCart = (products) => ({
+  type: actions.ADD_MULTIPLE_TO_CART,
+  payload: products
+});
+
 export {
   updateProducts,
   updateCurrentCategory,
@@ -38,4 +47,6 @@ export {
   addToCart,
   updateCartQuantity,
   removeFromCart,
+  toggleCart,
+  addMultipleToCart,
 };
