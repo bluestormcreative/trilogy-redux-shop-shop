@@ -33,7 +33,6 @@ function ProductItem(item) {
   //   }
   // }
 
-  console.log('productItem props: ', item);
   const {
     image,
     name,
