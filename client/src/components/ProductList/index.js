@@ -2,9 +2,7 @@ import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { useQuery } from '@apollo/react-hooks';
 
-// import { useStoreContext } from '../../utils/GlobalState';
-// import { UPDATE_PRODUCTS } from '../../utils/actions';
-import { updateProducts, updateCurrentCategory } from '../../utils/actionCreators';
+import { updateProducts } from '../../utils/actionCreators';
 import { QUERY_PRODUCTS } from "../../utils/queries";
 import { idbPromise } from "../../utils/helpers";
 
@@ -12,15 +10,11 @@ import ProductItem from "../ProductItem";
 import spinner from "../../assets/spinner.gif"
 
 function ProductList(props) {
-  // const [state, dispatch] = useStoreContext();
   const { currentCategory, loadProducts } = props;
-  console.log('current cat: ', currentCategory);
   const { loading, data } = useQuery(QUERY_PRODUCTS);
-  console.log('useQuery data:' , data); // eslint-disable-line no-console
   
   useEffect(() => {
     if(data && data.length !== 0) {
-      console.log('productlist useeffect data: ', data);
       loadProducts(data.products);
   
       data.products.forEach((product) => {
@@ -43,7 +37,6 @@ function ProductList(props) {
    */
   function filterProducts() {
     if (!currentCategory) {
-      console.log('no current cat');
       return props.products;
     }
   
@@ -84,7 +77,6 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => ({
   loadProducts: (data) => dispatch(updateProducts(data)),
-  updateCurrentCategory: () => dispatch(updateCurrentCategory())
 })
   // ...
 export default connect(
