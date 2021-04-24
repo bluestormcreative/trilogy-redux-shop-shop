@@ -1,56 +1,59 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { connect } from "react-redux";
 import { useQuery } from '@apollo/react-hooks';
 
 // import { useStoreContext } from '../../utils/GlobalState';
-import { UPDATE_PRODUCTS } from '../../utils/actions';
+// import { UPDATE_PRODUCTS } from '../../utils/actions';
+import { updateProducts, updateCurrentCategory } from '../../utils/actionCreators';
 import { QUERY_PRODUCTS } from "../../utils/queries";
 import { idbPromise } from "../../utils/helpers";
 
 import ProductItem from "../ProductItem";
 import spinner from "../../assets/spinner.gif"
 
-function ProductList() {
-  const [state, dispatch] = useStoreContext();
-
-  const { currentCategory } = state;
-  
+function ProductList(props) {
+  // const [state, dispatch] = useStoreContext();
+  const { currentCategory, loadProducts } = props;
+  console.log('current cat: ', currentCategory);
   const { loading, data } = useQuery(QUERY_PRODUCTS);
+  console.log('useQuery data:' , data); // eslint-disable-line no-console
   
   useEffect(() => {
-    if(data) {
-      dispatch({
-        type: UPDATE_PRODUCTS,
-        products: data.products
-      });
+    if(data && data.length !== 0) {
+      console.log('productlist useeffect data: ', data);
+      loadProducts(data.products);
   
       data.products.forEach((product) => {
         idbPromise('products', 'put', product);
       });
       // add else if to check if `loading` is undefined in `useQuery()` Hook
     } else if (!loading) {
-      // since we're offline, get all of the data from the `products` store
+      // since we're offline, get all of the data from the `products` indexeddb store
       idbPromise('products', 'get').then((products) => {
         // use retrieved data to set global state for offline browsing
-        dispatch({
-          type: UPDATE_PRODUCTS,
-          products: products
-        });
+        loadProducts(products);
       });
     }
-  }, [data, loading, dispatch]);
+  }, [data, loading, loadProducts]);
   
+  /**
+   * Filter products by category.
+   * 
+   * @returns array
+   */
   function filterProducts() {
     if (!currentCategory) {
-      return state.products;
+      console.log('no current cat');
+      return props.products;
     }
   
-    return state.products.filter(product => product.category._id === currentCategory);
+    return props.products.filter(product => product.category._id === currentCategory);
   }
 
   return (
     <div className="my-2">
       <h2>Our Products:</h2>
-      {state.products.length ? (
+      {props.products.length ? (
         <div className="flex-row">
             {filterProducts().map(product => (
                 <ProductItem
@@ -72,4 +75,20 @@ function ProductList() {
   );
 }
 
-export default ProductList;
+const mapStateToProps = state => {
+  return {
+    currentCategory: state.currentCategory,
+    products: state.products
+  };
+};
+
+const mapDispatchToProps = dispatch => ({
+  loadProducts: (data) => dispatch(updateProducts(data)),
+  updateCurrentCategory: () => dispatch(updateCurrentCategory())
+})
+  // ...
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(ProductList);
+
