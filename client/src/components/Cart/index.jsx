@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { connect } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useLazyQuery } from '@apollo/react-hooks';
 import { loadStripe } from '@stripe/stripe-js';
 import Auth from '../../utils/auth';
@@ -12,26 +12,22 @@ import './style.css';
 
 const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
 
-const Cart = (props) => {
+const Cart = () => {
+  const dispatch = useDispatch();
+  const cart = useSelector(state => state.cart);
+  const cartOpen = useSelector(state => state.cartOpen);
   const [getCheckout, { data }] = useLazyQuery(QUERY_CHECKOUT); // Hook is not called on render, but on user action.
-
-  const {
-    addMultipleProductsToCart,
-    toggleCartOpen,
-    cart,
-    cartOpen,
-  } = props;
 
   useEffect(() => {
     async function getCart() {
       const storedCart = await idbPromise('cart', 'get');
-      addMultipleProductsToCart([...storedCart]);
+      dispatch(addMultipleToCart([...storedCart]));
     };
   
     if (!cart.length) {
       getCart();
     }
-  }, [cart.length, addMultipleProductsToCart]);
+  }, [cart.length, addMultipleToCart]);
 
   useEffect(() => {
     if (data) {
@@ -40,6 +36,10 @@ const Cart = (props) => {
       });
     }
   }, [data]);
+
+  const toggleCartOpen = () => {
+    dispatch(toggleCart);
+  }
 
   const calculateTotal = () => {
     let sum = 0;
@@ -107,16 +107,4 @@ const Cart = (props) => {
   );
 };
 
-const mapStateToProps = state => {
-  return {
-    cart: state.cart,
-    cartOpen: state.cartOpen,
-  };
-};
-
-const mapDispatchToProps = dispatch => ({
-  toggleCartOpen: () => dispatch(toggleCart()),
-  addMultipleProductsToCart: (data) => dispatch(addMultipleToCart(data)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Cart);
+export default Cart;
