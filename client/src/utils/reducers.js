@@ -66,13 +66,12 @@ export const rootReducer = (state, action) => {
       };
 
     case UPDATE_CART_QUANTITY:
-      console.log('update quantity data: ', action.payload);
       return {
         ...state,
         cartOpen: true,
         cart: state.cart.map(product => {
           if (action.payload._id === product._id) { // action._id
-            product.purchaseQuantity = action.payload.purchasequantity; // action.purchasequantity
+            product.purchaseQuantity = action.payload.purchaseQuantity; // action.purchaseQuantity
           }
           return product;
         })
