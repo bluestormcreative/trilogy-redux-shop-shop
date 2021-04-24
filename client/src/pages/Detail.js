@@ -20,6 +20,7 @@ const Detail = ({
   loadProducts,
   updateProductCartQuantity,
   addProductToCart,
+  removeProductFromCart,
   cart,
 }) => {
   const { id } = useParams();
@@ -48,10 +49,9 @@ const Detail = ({
   }, [products, data, loading, loadProducts, id]);
 
   const addToCart = () => {
-    const itemInCart = cart.find((cartItem) => cartItem._id === id)
-    console.log('cart: ', cart);
+    const itemInCart = cart.find((cartItem) => cartItem._id === id);
+
     if (itemInCart) {
-      console.log('item is in cart!: ', itemInCart);
         updateProductCartQuantity({
           _id: id,
           purchaseQuantity: parseInt(itemInCart.purchaseQuantity) + 1,
@@ -62,16 +62,14 @@ const Detail = ({
         purchaseQuantity: parseInt(itemInCart.purchaseQuantity) + 1
       });
     } else {
-        addProductToCart({ 
-          product: { ...currentProduct, purchaseQuantity: 1 }
-        });
+        addProductToCart({ ...currentProduct, purchaseQuantity: 1 });
       // if product isn't in the cart yet, add it to the current shopping cart in IndexedDB
       idbPromise('cart', 'put', { ...currentProduct, purchaseQuantity: 1 });
     }
   };
 
   const removeFromCart = () => {
-    removeItemFromCart(currentProduct._id);
+    removeProductFromCart(currentProduct._id);
 
     // upon removal from cart, delete the item from IndexedDB using the `currentProduct._id` to locate what to remove
     idbPromise('cart', 'delete', { ...currentProduct });
@@ -121,7 +119,6 @@ const Detail = ({
 };
 
 const mapStateToProps = state => {
-  console.log('state: ', state);
   return {
     products: state.products,
     cart: state.cart,
