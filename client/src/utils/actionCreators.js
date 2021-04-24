@@ -1,7 +1,6 @@
 import * as actions from './actions';
 
 const updateProducts = (data) => {
-  console.log('updateProducts data: ', data);
   return {
   type: actions.UPDATE_PRODUCTS,
   payload: data
