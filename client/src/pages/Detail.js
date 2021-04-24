@@ -2,58 +2,56 @@ import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from '@apollo/react-hooks';
-import { updateProducts } from '../utils/actionCreators';
-
 import {
-  REMOVE_FROM_CART,
-  UPDATE_CART_QUANTITY,
-  ADD_TO_CART,
-} from '../utils/actions';
+  updateProducts,
+  addItemToCart,
+  updateCartQuantity,
+  removeItemFromCart,
+} from '../utils/actionCreators';
+
 import { QUERY_PRODUCTS } from "../utils/queries";
 import { idbPromise } from "../utils/helpers";
 
 // import Cart from '../components/Cart';
 import spinner from '../assets/spinner.gif'
 
-
-function Detail({products, loadProducts, cart}) {
+const Detail = ({
+  products,
+  loadProducts,
+  updateProductCartQuantity,
+  addProductToCart,
+  cart,
+}) => {
   const { id } = useParams();
 
-  const addToCart = () => {};
-  // const addToCart = () => {
-  //   const itemInCart = props.cart.find((cartItem) => cartItem._id === id)
+  const addToCart = () => {
+    const itemInCart = cart.find((cartItem) => cartItem._id === id)
   
-  //   if (itemInCart) {
-  //     dispatch({
-  //       type: UPDATE_CART_QUANTITY,
-  //       _id: id,
-  //       purchaseQuantity: parseInt(itemInCart.purchaseQuantity) + 1
-  //     });
-  //     // if we're updating quantity, use existing item data and increment purchaseQuantity value by one
-  //     idbPromise('cart', 'put', {
-  //       ...itemInCart,
-  //       purchaseQuantity: parseInt(itemInCart.purchaseQuantity) + 1
-  //     });
-  //   } else {
-  //     dispatch({
-  //       type: ADD_TO_CART,
-  //       product: { ...currentProduct, purchaseQuantity: 1 }
-  //     });
-  //     // if product isn't in the cart yet, add it to the current shopping cart in IndexedDB
-  //     idbPromise('cart', 'put', { ...currentProduct, purchaseQuantity: 1 });
-  //   }
-  // }
+    if (itemInCart) {
+        updateProductCartQuantity({
+          _id: id,
+          purchaseQuantity: parseInt(itemInCart.purchaseQuantity) + 1,
+        });
+      // if we're updating quantity, use existing item data and increment purchaseQuantity value by one
+      idbPromise('cart', 'put', {
+        ...itemInCart,
+        purchaseQuantity: parseInt(itemInCart.purchaseQuantity) + 1
+      });
+    } else {
+        addProductToCart({ 
+          product: { ...currentProduct, purchaseQuantity: 1 }
+        });
+      // if product isn't in the cart yet, add it to the current shopping cart in IndexedDB
+      idbPromise('cart', 'put', { ...currentProduct, purchaseQuantity: 1 });
+    }
+  };
 
-  const removeFromCart = () => {};
-  // const removeFromCart = () => {
-  //   dispatch({
-  //     type: REMOVE_FROM_CART,
-  //     _id: currentProduct._id
-  //   });
-  
-  //   // upon removal from cart, delete the item from IndexedDB using the `currentProduct._id` to locate what to remove
-  //   idbPromise('cart', 'delete', { ...currentProduct });
-  // };
+  const removeFromCart = () => {
+    removeItemFromCart(currentProduct._id);
+
+    // upon removal from cart, delete the item from IndexedDB using the `currentProduct._id` to locate what to remove
+    idbPromise('cart', 'delete', { ...currentProduct });
+  };
 
   const [currentProduct, setCurrentProduct] = useState({})
 
@@ -124,6 +122,7 @@ function Detail({products, loadProducts, cart}) {
 };
 
 const mapStateToProps = state => {
+  console.log('state: ', state);
   return {
     products: state.products,
     cart: state.cart,
@@ -131,8 +130,11 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = dispatch => ({
-  loadProducts: (data) => dispatch(updateProducts(data))
-})
+  loadProducts: (data) => dispatch(updateProducts(data)),
+  addProductToCart: (data) => dispatch(addItemToCart(data)),
+  updateProductCartQuantity: (data) => dispatch(updateCartQuantity(data)),
+  removeProductFromCart: (data) => dispatch(removeItemFromCart(data)),
+});
 
 export default connect(
   mapStateToProps,
