@@ -4,9 +4,9 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery } from '@apollo/react-hooks';
 import {
   updateProducts,
-  addItemToCart,
+  addToCart,
   updateCartQuantity,
-  removeItemFromCart,
+  removeFromCart,
 } from '../utils/actionCreators';
 
 import { QUERY_PRODUCTS } from "../utils/queries";
@@ -23,11 +23,35 @@ const Detail = ({
   cart,
 }) => {
   const { id } = useParams();
+  const [currentProduct, setCurrentProduct] = useState({})
+  const { loading, data } = useQuery(QUERY_PRODUCTS);
+
+  useEffect(() => {
+    // already in global store
+    if (products.length) {
+      setCurrentProduct(products.find(product => product._id === id));
+    } 
+    // retrieved from server
+    else if (data) {
+      loadProducts(data.products);
+  
+      data.products.forEach((product) => {
+        idbPromise('products', 'put', product);
+      });
+    }
+    // get cache from idb
+    else if (!loading) {
+      idbPromise('products', 'get').then((indexedProducts) => {
+        loadProducts(data.products);
+      });
+    }
+  }, [products, data, loading, loadProducts, id]);
 
   const addToCart = () => {
     const itemInCart = cart.find((cartItem) => cartItem._id === id)
-  
+    console.log('cart: ', cart);
     if (itemInCart) {
+      console.log('item is in cart!: ', itemInCart);
         updateProductCartQuantity({
           _id: id,
           purchaseQuantity: parseInt(itemInCart.purchaseQuantity) + 1,
@@ -52,31 +76,6 @@ const Detail = ({
     // upon removal from cart, delete the item from IndexedDB using the `currentProduct._id` to locate what to remove
     idbPromise('cart', 'delete', { ...currentProduct });
   };
-
-  const [currentProduct, setCurrentProduct] = useState({})
-
-  const { loading, data } = useQuery(QUERY_PRODUCTS);
-
-  useEffect(() => {
-    // already in global store
-    if (products.length) {
-      setCurrentProduct(products.find(product => product._id === id));
-    } 
-    // retrieved from server
-    else if (data) {
-      loadProducts(data.products);
-  
-      data.products.forEach((product) => {
-        idbPromise('products', 'put', product);
-      });
-    }
-    // get cache from idb
-    else if (!loading) {
-      idbPromise('products', 'get').then((indexedProducts) => {
-        loadProducts(data.products);
-      });
-    }
-  }, [products, data, loading, loadProducts, id]);
 
   return (
     <>
@@ -131,9 +130,9 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => ({
   loadProducts: (data) => dispatch(updateProducts(data)),
-  addProductToCart: (data) => dispatch(addItemToCart(data)),
+  addProductToCart: (data) => dispatch(addToCart(data)),
   updateProductCartQuantity: (data) => dispatch(updateCartQuantity(data)),
-  removeProductFromCart: (data) => dispatch(removeItemFromCart(data)),
+  removeProductFromCart: (data) => dispatch(removeFromCart(data)),
 });
 
 export default connect(

@@ -16,7 +16,7 @@ const updateCategories = (data) => ({
   payload: data
 });
 
-const addItemToCart = (data) => ({
+const addToCart = (data) => ({
   type: actions.ADD_TO_CART,
   payload: data
 });
@@ -26,7 +26,7 @@ const updateCartQuantity = (data) => ({
   payload: data
 });
 
-const removeItemFromCart = (data) => ({
+const removeFromCart = (data) => ({
   type: actions.REMOVE_FROM_CART,
   payload: data
 });
@@ -35,7 +35,7 @@ export {
   updateProducts,
   updateCurrentCategory,
   updateCategories,
-  addItemToCart,
+  addToCart,
   updateCartQuantity,
-  removeItemFromCart,
+  removeFromCart,
 };
