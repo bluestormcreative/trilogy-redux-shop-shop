@@ -4,13 +4,10 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery } from '@apollo/react-hooks';
 import { updateProducts } from '../utils/actionCreators';
 
-
-// import { useStoreContext } from '../utils/GlobalState';
 import {
   REMOVE_FROM_CART,
   UPDATE_CART_QUANTITY,
   ADD_TO_CART,
-  UPDATE_PRODUCTS,
 } from '../utils/actions';
 import { QUERY_PRODUCTS } from "../utils/queries";
 import { idbPromise } from "../utils/helpers";
@@ -19,11 +16,10 @@ import { idbPromise } from "../utils/helpers";
 import spinner from '../assets/spinner.gif'
 
 
-function Detail(props) {
+function Detail({products, loadProducts, cart}) {
   const { id } = useParams();
-  // const [state, dispatch] = useStoreContext();
-  // const { products, cart } = state;
 
+  const addToCart = () => {};
   // const addToCart = () => {
   //   const itemInCart = props.cart.find((cartItem) => cartItem._id === id)
   
@@ -48,6 +44,7 @@ function Detail(props) {
   //   }
   // }
 
+  const removeFromCart = () => {};
   // const removeFromCart = () => {
   //   dispatch({
   //     type: REMOVE_FROM_CART,
@@ -64,12 +61,12 @@ function Detail(props) {
 
   useEffect(() => {
     // already in global store
-    if (props.products.length) {
-      setCurrentProduct(props.products.find(product => product._id === id));
+    if (products.length) {
+      setCurrentProduct(products.find(product => product._id === id));
     } 
     // retrieved from server
     else if (data) {
-      updateProducts(data.products);
+      loadProducts(data.products);
   
       data.products.forEach((product) => {
         idbPromise('products', 'put', product);
@@ -78,10 +75,10 @@ function Detail(props) {
     // get cache from idb
     else if (!loading) {
       idbPromise('products', 'get').then((indexedProducts) => {
-        updateProducts(data.products);
+        loadProducts(data.products);
       });
     }
-  }, [products, data, loading, dispatch, id]);
+  }, [products, data, loading, loadProducts, id]);
 
   return (
     <>
@@ -105,7 +102,7 @@ function Detail(props) {
               Add to Cart
             </button>
             <button
-              disabled={!props.cart.find(p => p._id === currentProduct._id)}
+              disabled={!cart.find(p => p._id === currentProduct._id)}
               onClick={removeFromCart}
             >
               Remove from Cart
@@ -128,13 +125,13 @@ function Detail(props) {
 
 const mapStateToProps = state => {
   return {
-    products: state.products
+    products: state.products,
+    cart: state.cart,
   };
 };
 
-
 const mapDispatchToProps = dispatch => ({
-  updateProducts: () => dispatch(updateProducts())
+  loadProducts: (data) => dispatch(updateProducts(data))
 })
 
 export default connect(
