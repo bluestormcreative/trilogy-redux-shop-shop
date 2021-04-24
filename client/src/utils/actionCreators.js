@@ -1,34 +1,34 @@
 import * as actions from './actions';
 
-const updateProducts = (data) => {
+const updateProducts = (products) => {
   return {
   type: actions.UPDATE_PRODUCTS,
-  payload: data
+  payload: products
 }};
 
-const updateCurrentCategory = (data) => ({
+const updateCurrentCategory = (catId) => ({
   type: actions.UPDATE_CURRENT_CATEGORY,
-  payload: data
+  payload: catId
 });
 
-const updateCategories = (data) => ({
+const updateCategories = (categories) => ({
   type: actions.UPDATE_CATEGORIES,
-  payload: data
+  payload: categories
 });
 
-const addToCart = (data) => ({
+const addToCart = (product) => ({
   type: actions.ADD_TO_CART,
-  payload: data
+  payload: product
 });
 
-const updateCartQuantity = (data) => ({
+const updateCartQuantity = (productData) => ({
   type: actions.UPDATE_CART_QUANTITY,
-  payload: data
+  payload: productData
 });
 
-const removeFromCart = (data) => ({
+const removeFromCart = (productId) => ({
   type: actions.REMOVE_FROM_CART,
-  payload: data
+  payload: productId
 });
 
 export {
