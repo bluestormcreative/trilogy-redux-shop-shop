@@ -12,7 +12,13 @@ const updateCurrentCategory = (data) => ({
   payload: data
 });
 
+const updateCategories = (data) => ({
+  type: actions.UPDATE_CATEGORIES,
+  payload: data
+});
+
 export {
   updateProducts,
-  updateCurrentCategory
+  updateCurrentCategory,
+  updateCategories
 };
