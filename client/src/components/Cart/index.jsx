@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { connect } from "react-redux";
 import { useLazyQuery } from '@apollo/react-hooks';
 import { loadStripe } from '@stripe/stripe-js';
 import Auth from '../../utils/auth';
@@ -12,20 +13,20 @@ import './style.css';
 
 const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
 
-const Cart = () => {
-  const [state, dispatch] = useStoreContext();
+const Cart = (props) => {
+  // const [state, dispatch] = useStoreContext();
   const [getCheckout, { data }] = useLazyQuery(QUERY_CHECKOUT); // Hook is not called on render, but on user action.
 
-  useEffect(() => {
-    async function getCart() {
-      const cart = await idbPromise('cart', 'get');
-      dispatch({ type: ADD_MULTIPLE_TO_CART, products: [...cart] });
-    };
+  // useEffect(() => {
+  //   async function getCart() {
+  //     const cart = await idbPromise('cart', 'get');
+  //     // dispatch({ type: ADD_MULTIPLE_TO_CART, products: [...cart] });
+  //   };
   
-    if (!state.cart.length) {
-      getCart();
-    }
-  }, [state.cart.length, dispatch]);
+  //   if (!props.cart.length) {
+  //     getCart();
+  //   }
+  // }, [props.cart.length, dispatch]);
 
   useEffect(() => {
     if (data) {
@@ -35,9 +36,9 @@ const Cart = () => {
     }
   }, [data]);
 
-  const toggleCart = () => {
-    dispatch({ type: TOGGLE_CART });
-  };
+  // const toggleCart = () => {
+  //   dispatch({ type: TOGGLE_CART });
+  // };
 
   const calculateTotal = () => {
     let sum = 0;
@@ -50,7 +51,7 @@ const Cart = () => {
   function submitCheckout() {
     const productIds = [];
   
-    state.cart.forEach((item) => {
+    props.cart.forEach((item) => {
       for (let i = 0; i < item.purchaseQuantity; i++) {
         productIds.push(item._id);
       }
@@ -61,7 +62,7 @@ const Cart = () => {
     });
   }
 
-  if (!state.cartOpen) {
+  if (!props.cartOpen) {
     return (
       <div className="cart-closed" onClick={toggleCart}>
         <span
@@ -105,4 +106,10 @@ const Cart = () => {
   );
 };
 
-export default Cart;
+const mapStateToProps = state => {
+  return {
+    cart: state.cart
+  };
+};
+
+export default connect(mapStateToProps)(Cart);
