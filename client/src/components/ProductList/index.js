@@ -78,7 +78,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => ({
   loadProducts: (data) => dispatch(updateProducts(data)),
 })
-  // ...
+
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
