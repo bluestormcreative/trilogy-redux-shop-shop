@@ -56,7 +56,7 @@ export const rootReducer = (state, action) => {
 
     case REMOVE_FROM_CART:
       let newState = state.cart.filter(product => {
-        return product._id !== action._id;
+        return product._id !== action.payload._id; // action._id
       });
     
       return {
@@ -66,12 +66,13 @@ export const rootReducer = (state, action) => {
       };
 
     case UPDATE_CART_QUANTITY:
+      console.log('update quantity data: ', action.payload);
       return {
         ...state,
         cartOpen: true,
         cart: state.cart.map(product => {
-          if (action._id === product._id) {
-            product.purchaseQuantity = action.payload; // action.purchasequantity
+          if (action.payload._id === product._id) { // action._id
+            product.purchaseQuantity = action.payload.purchasequantity; // action.purchasequantity
           }
           return product;
         })
