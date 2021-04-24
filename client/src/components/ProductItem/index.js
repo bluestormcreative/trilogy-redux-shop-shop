@@ -1,15 +1,10 @@
 import React from "react";
-import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
-// import { useStoreContext } from '../../utils/GlobalState';
 import { ADD_TO_CART, UPDATE_CART_QUANTITY } from '../../utils/actions';
 import { pluralize, idbPromise } from "../../utils/helpers"
 
-function ProductItem(item) {
-  // const [state, dispatch] = useStoreContext();
-
-  // const { item, cart } = props;
+function ProductItem({ item, cart }) {
 
   const addToCart = () => {};
   // const addToCart = () => {
