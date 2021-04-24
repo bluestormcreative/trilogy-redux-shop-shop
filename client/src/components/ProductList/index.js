@@ -9,8 +9,7 @@ import { idbPromise } from "../../utils/helpers";
 import ProductItem from "../ProductItem";
 import spinner from "../../assets/spinner.gif"
 
-function ProductList(props) {
-  const { currentCategory, loadProducts } = props;
+function ProductList({ currentCategory, products, loadProducts }) {
   const { loading, data } = useQuery(QUERY_PRODUCTS);
   
   useEffect(() => {
@@ -37,16 +36,16 @@ function ProductList(props) {
    */
   function filterProducts() {
     if (!currentCategory) {
-      return props.products;
+      return products;
     }
   
-    return props.products.filter(product => product.category._id === currentCategory);
+    return products.filter(product => product.category._id === currentCategory);
   }
 
   return (
     <div className="my-2">
       <h2>Our Products:</h2>
-      {props.products.length ? (
+      {products.length ? (
         <div className="flex-row">
             {filterProducts().map(product => (
                 <ProductItem
