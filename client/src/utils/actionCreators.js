@@ -17,8 +17,14 @@ const updateCategories = (data) => ({
   payload: data
 });
 
+const addToCart = (data) => ({
+  type: actions.ADD_TO_CART,
+  payload: data
+});
+
 export {
   updateProducts,
   updateCurrentCategory,
-  updateCategories
+  updateCategories,
+  addToCart,
 };
