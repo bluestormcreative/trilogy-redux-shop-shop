@@ -20,7 +20,7 @@ export const initialState = {
   currentCategory: '',
 };
 
-export const rootReducer = (state = initialState, action) => {
+export const rootReducer = (state, action) => {
   switch (action.type) {
     // if action type value is the value of `UPDATE_PRODUCTS`, return a new state object with an updated products array
     case UPDATE_PRODUCTS:
