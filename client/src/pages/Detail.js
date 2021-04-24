@@ -12,7 +12,7 @@ import {
 import { QUERY_PRODUCTS } from "../utils/queries";
 import { idbPromise } from "../utils/helpers";
 
-// import Cart from '../components/Cart';
+import Cart from '../components/Cart';
 import spinner from '../assets/spinner.gif'
 
 const Detail = ({
@@ -113,7 +113,7 @@ const Detail = ({
       {
         loading ? <img src={spinner} alt="loading" /> : null
       }
-      {/* <Cart /> */}
+      <Cart />
     </>
   );
 };
