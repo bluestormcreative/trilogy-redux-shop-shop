@@ -30,7 +30,7 @@ const Detail = ({
   useEffect(() => {
     // already in global store
     if (products.length) {
-      setCurrentProduct(products.find(product => product._id === id));
+      setCurrentProduct(products.find(product => product._id === id)); // Id from params.
     } 
     // retrieved from server
     else if (data) {
@@ -49,7 +49,7 @@ const Detail = ({
   }, [products, data, loading, loadProducts, id]);
 
   const addToCart = () => {
-    const itemInCart = cart.find((cartItem) => cartItem._id === id);
+    const itemInCart = cart.find((cartItem) => cartItem._id === id); // Id from params
 
     if (itemInCart) {
         updateProductCartQuantity({
