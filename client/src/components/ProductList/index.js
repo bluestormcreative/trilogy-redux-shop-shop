@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { connect } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useQuery } from '@apollo/react-hooks';
 
 import { updateProducts } from '../../utils/actionCreators';
@@ -9,12 +9,15 @@ import { idbPromise } from "../../utils/helpers";
 import ProductItem from "../ProductItem";
 import spinner from "../../assets/spinner.gif"
 
-function ProductList({ currentCategory, products, loadProducts }) {
+function ProductList() {
+  const products = useSelector(state => state.products);
+  const currentCategory = useSelector(state => state.currentCategory);
+  const dispatch = useDispatch();
   const { loading, data } = useQuery(QUERY_PRODUCTS);
   
   useEffect(() => {
     if(data && data.length !== 0) {
-      loadProducts(data.products);
+      dispatch(updateProducts(data.products));
   
       data.products.forEach((product) => {
         idbPromise('products', 'put', product);
@@ -24,10 +27,10 @@ function ProductList({ currentCategory, products, loadProducts }) {
       // since we're offline, get all of the data from the `products` indexeddb store
       idbPromise('products', 'get').then((products) => {
         // use retrieved data to set global state for offline browsing
-        loadProducts(products);
+        dispatch(updateProducts(products));
       });
     }
-  }, [data, loading, loadProducts]);
+  }, [data, loading, updateProducts]);
   
   /**
    * Filter products by category.
@@ -67,19 +70,5 @@ function ProductList({ currentCategory, products, loadProducts }) {
   );
 }
 
-const mapStateToProps = state => {
-  return {
-    currentCategory: state.currentCategory,
-    products: state.products
-  };
-};
-
-const mapDispatchToProps = dispatch => ({
-  loadProducts: (data) => dispatch(updateProducts(data)),
-})
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(ProductList);
+export default ProductList;
 
